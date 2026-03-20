@@ -1,0 +1,227 @@
+%%{ init: { 
+  'theme': 'base', 
+  'themeVariables': { 
+    'primaryColor': '#00A651',
+    'primaryTextColor': '#ffffff',
+    'primaryBorderColor': '#008541',
+    'secondaryColor': '#1a1a1a',
+    'secondaryTextColor': '#ffffff',
+    'secondaryBorderColor': '#383838',
+    'tertiaryColor': '#f4f6f9',
+    'tertiaryTextColor': '#333333',
+    'tertiaryBorderColor': '#cccccc',
+    'lineColor': '#555555',
+    'textColor': '#333333',
+    'fontSize': '14px'
+  }
+} }%%
+
+graph TB
+    %% ============================================================
+    %% SCHOLARCONTROL EMERITUS — SYSTEM ARCHITECTURE
+    %% ============================================================
+
+    %% --- CLIENT LAYER ---
+    subgraph CLIENT["🖥️ CLIENT LAYER — Browser"]
+        direction TB
+        
+        subgraph SHELL["Application Shell (index.php)"]
+            direction LR
+            SIDEBAR["Sidebar<br/><i>Role-Based Navigation</i><br/>sidebar.php"]
+            NAVBAR["Navbar<br/><i>Session Info / Logout</i><br/>navbar.php"]
+            CONTENT["#main-content<br/><i>Dynamic Content Area</i>"]
+        end
+
+        subgraph ROUTER["SPA Router (app.js)"]
+            direction LR
+            HASHROUTE["Hash-Based Routing<br/><i>#dashboard, #cohort-student...</i>"]
+            PAGELOADER["Dynamic Page Loader<br/><i>fetch → view.php injection</i>"]
+            ASSETMGR["Asset Manager<br/><i>Load/Cleanup CSS + JS</i>"]
+            CSRFINJECT["CSRF Interceptor<br/><i>Auto-inject X-CSRF-Token</i>"]
+            WHITELIST["Page Whitelist<br/><i>LFI Prevention</i>"]
+        end
+
+        subgraph MODULES_UI["📄 Page Modules (Frontend)"]
+            direction TB
+            M1_UI["Dashboard<br/><i>view.php + script.js + style.css</i>"]
+            M2_UI["Programs Management<br/><i>view.php + script.js</i>"]
+            M3_UI["Course Runs<br/><i>view.php + script.js</i>"]
+            M4_UI["Cohort & Students<br/><i>view.php + script.js</i>"]
+            M5_UI["Course Grades<br/><i>view.php + script.js</i>"]
+            M6_UI["Partner Contacts<br/><i>view.php + script.js</i>"]
+            M7_UI["User Management<br/><i>view.php + script.js</i>"]
+        end
+
+        subgraph JSLIBS["JS Libraries (CDN)"]
+            direction LR
+            BS5["Bootstrap 5"]
+            CHARTJS["Chart.js"]
+            CHOICES["Choices.js"]
+            SHEETJS["SheetJS / XLSX"]
+            FA["FontAwesome 6"]
+        end
+    end
+
+    %% --- SECURITY LAYER ---
+    subgraph SECURITY["🔒 SECURITY LAYER"]
+        direction LR
+        CSRF["CSRF Token Validation<br/><i>random_bytes(32) + hash_equals</i>"]
+        SESSION["Session Management<br/><i>httponly, SameSite=Strict</i>"]
+        RBAC["Role-Based Access Control<br/><i>Roles: 1, 2, 3, 5</i>"]
+        SQLINJ["SQL Injection Prevention<br/><i>100% Prepared Statements</i>"]
+        PWDHASH["Password Security<br/><i>password_hash / bcrypt</i>"]
+    end
+
+    %% --- BACKEND LAYER ---
+    subgraph BACKEND["⚙️ BACKEND LAYER — PHP 8+"]
+        direction TB
+
+        CONFIG["config.php<br/><i>DB Connection, Session, CSRF,<br/>Mail Config, Global Guards</i>"]
+
+        subgraph API_ENDPOINTS["API Endpoints (api.php per module)"]
+            direction TB
+            API_DASH["Dashboard API<br/><i>get_dashboard_stats</i>"]
+            API_PROG["Programs API<br/><i>CRUD: products, partners,<br/>programs, courses</i>"]
+            API_RUNS["Course Runs API<br/><i>CRUD + cohort linking/<br/>unlinking</i>"]
+            API_COHORT["Cohort-Student API<br/><i>CRUD, import validation,<br/>history, mass status,<br/>partner notifications</i>"]
+            API_GRADES["Course Grades API<br/><i>get students, save grades<br/>(numerical + status)</i>"]
+            API_PARTNER["Partner Contacts API<br/><i>CRUD + toggle status<br/>+ duplicate validation</i>"]
+            API_USERS["Users API<br/><i>CRUD + toggleStatus<br/>+ getRoles</i>"]
+        end
+
+        subgraph MAILER["📧 Mail Engine (includes/mailer.php)"]
+            direction LR
+            MAILSWITCH{"MAIL_METHOD<br/>Switch"}
+            SMTP["SMTP Mode<br/><i>PHPMailer 7<br/>via Composer</i>"]
+            NATIVEMAIL["Native mail()<br/><i>Postfix / Sendmail</i>"]
+            NOMAIL["None Mode<br/><i>Dry Run / Testing</i>"]
+        end
+    end
+
+    %% --- DATA LAYER ---
+    subgraph DATABASE["🗄️ DATA LAYER — MySQL 8+ / MariaDB"]
+        direction TB
+
+        subgraph CATALOGS["Catalog Tables"]
+            direction LR
+            CAT_PROD["CatalogProduct"]
+            CAT_PART["CatalogPartner"]
+            CAT_COHST["CatalogCohortStatus"]
+            CAT_STUST["CatalogStudentStatus"]
+            CAT_RUNST["CatalogRunStatus"]
+            CAT_REASON["CatalogReasonTermination"]
+            CAT_ROL["TableRol"]
+        end
+
+        subgraph CORE_TABLES["Core Entity Tables"]
+            direction LR
+            T_PROG["TablePrograms"]
+            T_COURSES["TableProgramsCourses"]
+            T_COHORT["TableCohort"]
+            T_STUDENTS["TableStudentList"]
+            T_RUNS["TableCourseRun"]
+            T_USERS["TableUsers"]
+            T_CONTACTS["TablePartnerContacts"]
+        end
+
+        subgraph JUNCTION["Junction & History Tables"]
+            direction LR
+            T_RUNCOHORT["TableRunCohort<br/><i>Course Run ↔ Cohort</i>"]
+            T_HISTORY["TableHistoryStatus<br/>StudentList<br/><i>Audit Trail</i>"]
+            T_HISTCONTACT["TableHistoryStatus<br/>ContactList<br/><i>Notified Contacts</i>"]
+            T_RATINGS["TableHighRatings<br/><i>Student Grades</i>"]
+        end
+    end
+
+    %% --- EXTERNAL SERVICES ---
+    subgraph EXTERNAL["☁️ EXTERNAL SERVICES"]
+        direction LR
+        SMTPRELAY["SMTP Relay<br/><i>Brevo / SendinBlue</i>"]
+        PARTNERMAIL["Partner Contact<br/>Email Inboxes"]
+    end
+
+    %% ============================================================
+    %% CONNECTIONS
+    %% ============================================================
+
+    %% Client → Router
+    SIDEBAR --> HASHROUTE
+    HASHROUTE --> PAGELOADER
+    PAGELOADER --> ASSETMGR
+    PAGELOADER --> CONTENT
+
+    %% Router → Modules
+    PAGELOADER --> M1_UI
+    PAGELOADER --> M2_UI
+    PAGELOADER --> M3_UI
+    PAGELOADER --> M4_UI
+    PAGELOADER --> M5_UI
+    PAGELOADER --> M6_UI
+    PAGELOADER --> M7_UI
+
+    %% Modules → Security → API
+    M1_UI -->|"fetch + CSRF"| CSRF
+    M2_UI -->|"fetch + CSRF"| CSRF
+    M3_UI -->|"fetch + CSRF"| CSRF
+    M4_UI -->|"fetch + CSRF"| CSRF
+    M5_UI -->|"fetch + CSRF"| CSRF
+    M6_UI -->|"fetch + CSRF"| CSRF
+    M7_UI -->|"fetch + CSRF"| CSRF
+
+    CSRF --> SESSION
+    SESSION --> RBAC
+    RBAC --> SQLINJ
+
+    %% Security → API Endpoints
+    SQLINJ --> API_DASH
+    SQLINJ --> API_PROG
+    SQLINJ --> API_RUNS
+    SQLINJ --> API_COHORT
+    SQLINJ --> API_GRADES
+    SQLINJ --> API_PARTNER
+    SQLINJ --> API_USERS
+
+    %% API → Config
+    CONFIG --> API_ENDPOINTS
+
+    %% API → Database
+    API_DASH --> CORE_TABLES
+    API_DASH --> CATALOGS
+    API_PROG --> T_PROG
+    API_PROG --> T_COURSES
+    API_PROG --> CAT_PROD
+    API_PROG --> CAT_PART
+    API_RUNS --> T_RUNS
+    API_RUNS --> T_RUNCOHORT
+    API_COHORT --> T_COHORT
+    API_COHORT --> T_STUDENTS
+    API_COHORT --> T_HISTORY
+    API_COHORT --> T_HISTCONTACT
+    API_GRADES --> T_RATINGS
+    API_PARTNER --> T_CONTACTS
+    API_USERS --> T_USERS
+    API_USERS --> CAT_ROL
+
+    %% Mail Flow
+    API_COHORT -->|"notifyPartnerContacts"| MAILSWITCH
+    MAILSWITCH --> SMTP
+    MAILSWITCH --> NATIVEMAIL
+    MAILSWITCH --> NOMAIL
+    SMTP -->|"PHPMailer TLS"| SMTPRELAY
+    SMTPRELAY -->|"HTML Email"| PARTNERMAIL
+
+    %% Import Pipeline (special flow)
+    SHEETJS -.->|"Client-side<br/>CSV/XLSX Parse"| M4_UI
+
+    %% Styling
+    classDef clientStyle fill:#e8f5e9,stroke:#00A651,stroke-width:2px,color:#1a1a1a
+    classDef securityStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1a1a1a
+    classDef backendStyle fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#1a1a1a
+    classDef dbStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#1a1a1a
+    classDef externalStyle fill:#fce4ec,stroke:#c62828,stroke-width:2px,color:#1a1a1a
+
+    class CLIENT clientStyle
+    class SECURITY securityStyle
+    class BACKEND backendStyle
+    class DATABASE dbStyle
+    class EXTERNAL externalStyle
