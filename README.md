@@ -227,9 +227,9 @@ Security was designed as a **defense-in-depth** strategy, not an afterthought:
 **Daniel Almazán**
 IT Project Manager · Technical Architect · Systems Integration Specialist
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/YOUR-PROFILE)
-[![Email](https://img.shields.io/badge/Email-Contact_Me-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:your.email@domain.com)
-[![Portfolio](https://img.shields.io/badge/Portfolio-View_More-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/YOUR-USERNAME)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)]([https://linkedin.com/in/YOUR-PROFILE](https://www.linkedin.com/in/daniel-almazan-l/))
+[![Email](https://img.shields.io/badge/Email-Contact_Me-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:[daniel.almazan.lopez16@gmail.com])
+[![Portfolio](https://img.shields.io/badge/Portfolio-View_More-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/danielalmazan-manager?tab=repositories))
 
 ---
 
