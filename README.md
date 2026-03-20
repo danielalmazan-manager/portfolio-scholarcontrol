@@ -202,7 +202,7 @@ Security was designed as a **defense-in-depth** strategy, not an afterthought:
 
 ## Architecture Diagram
 
-> `[Insert Architecture Diagram Here]`
+> `![System Architecture](./docs/architecture-diagram.png)`
 >
 > *A high-level block diagram illustrating the modular monolith structure, database relationships, the dynamic page-loading shell, SMTP integration layer, and role-based access flow will be placed here.*
 
